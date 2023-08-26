@@ -68,7 +68,6 @@ module.exports = {
 
         res.status(200).json({
           message: "Logged in Succesfully!",
-          data,
         });
       } else {
         res.status(401).json({
