@@ -28,5 +28,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/user", require("./Routes/userRoutes"));
+app.use("/budget", require("./Routes/userRoutes"));
 
 app.listen(port, () => console.log(`App running at ${port}`));
