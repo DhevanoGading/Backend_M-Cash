@@ -25,6 +25,7 @@ app.get("/", (req, res) => {
 
 app.use("/user", require("./src/Routes/userRoutes"));
 app.use("/budget", require("./src/Routes/budgetRoutes"));
+app.use("/expense", require("./src/Routes/expenseRoutes"));
 
 app.listen(port, () =>
   console.log(`App running at ${process.env.APP_URL}:${port}`)

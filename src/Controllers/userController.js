@@ -2,7 +2,11 @@ const bcrypt = require("bcrypt");
 const client = require("../config/appwritter");
 const { validationResult } = require("express-validator");
 const { generateTokens } = require("../Middleware/auth");
+const { generateId } = require("../utils/generateId");
 const { Databases, ID } = require("node-appwrite");
+const databases = new Databases(client);
+const databaseId = process.env.APP_WRITTER_DATABASE_ID;
+const collectionUsersId = process.env.APP_WRITTER_COLLECTION_USERS_ID;
 
 module.exports = {
   register: async (req, res) => {
@@ -13,21 +17,17 @@ module.exports = {
       }
 
       const user = {
+        user_id: await generateId(5),
         username: req.body.username,
         password: await bcrypt.hash(req.body.password, 10),
-        nama: req.body.name,
+        name: req.body.name,
       };
 
-      const databases = new Databases(client);
-
       await databases.createDocument(
-        process.env.APP_WRITTER_DATABASE_ID,
-        process.env.APP_WRITTER_COLLECTION_ID,
+        databaseId,
+        collectionUsersId,
         ID.unique(),
-        {
-          id_user: ID.unique(),
-          ...user,
-        }
+        user
       );
 
       res.status(200).json({
@@ -50,21 +50,23 @@ module.exports = {
       const username = req.body.username;
       const password = req.body.password;
 
-      const databases = new Databases(client);
-
-      const response = await databases.listDocuments(
-        process.env.APP_WRITTER_DATABASE_ID,
-        process.env.APP_WRITTER_COLLECTION_ID
+      const userDocuments = await databases.listDocuments(
+        databaseId,
+        collectionUsersId
       );
 
-      const users = response.documents;
+      const user = userDocuments.documents.find((e) => e.username === username);
 
-      const loginCheck = users.find((e) => {
-        return e.username === username && bcrypt.compare(password, e.password);
-      });
+      if (!user) {
+        return res
+          .status(404)
+          .json({ message: `Username ${username} not found!` });
+      }
 
-      if (loginCheck) {
-        const accessToken = generateTokens(loginCheck);
+      const passwordMatch = await bcrypt.compare(password, user.password);
+
+      if (passwordMatch) {
+        const accessToken = generateTokens(user);
         res.cookie("access_token", accessToken, {
           maxAge: 24 * 60 * 60 * 1000,
         });
@@ -73,7 +75,7 @@ module.exports = {
         });
       } else {
         res.status(401).json({
-          message: "Invalid Password or Username",
+          message: "Invalid Password",
         });
       }
     } catch (error) {
