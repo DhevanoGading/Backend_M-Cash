@@ -5,6 +5,7 @@ const { Databases, ID } = require("node-appwrite");
 const databases = new Databases(client);
 const databaseId = process.env.APP_WRITTER_DATABASE_ID;
 const collectionBudgetsId = process.env.APP_WRITTER_COLLECTION_BUDGETS_ID;
+const lengthId = process.env.APP_LENGTH_ID_GENERATOR;
 
 module.exports = {
   addBudget: async (req, res) => {
@@ -14,21 +15,86 @@ module.exports = {
         return res.status(400).json(errors.array());
       }
 
-      const budget = {
-        budget_id: await generateId(5),
+      const budgetData = {
+        budget_id: await generateId(lengthId),
         user_id: req.user.user_id,
         amount: req.body.amount,
       };
+
+      const budgetDocuments = await databases.listDocuments(
+        databaseId,
+        collectionBudgetsId
+      );
+
+      const budget = budgetDocuments.documents.find(
+        (e) => e.user_id === budgetData.user_id
+      );
+
+      if (budget) {
+        return res.status(404).json({ message: `User already has a budget!` });
+      }
 
       await databases.createDocument(
         databaseId,
         collectionBudgetsId,
         ID.unique(),
-        budget
+        budgetData
       );
 
       res.status(200).json({
         message: "Add Budget Successfully!",
+      });
+    } catch (error) {
+      console.error("Error executing query:", error);
+      res.status(500).json({
+        message: "Error executing query",
+        error: error.message,
+      });
+    }
+  },
+  getBudgetById: async (req, res) => {
+    try {
+      const { user_id } = req.user;
+      const budgetDocuments = await databases.listDocuments(
+        databaseId,
+        collectionBudgetsId
+      );
+
+      const budget = budgetDocuments.documents.find(
+        (e) => e.user_id === user_id
+      );
+
+      res.status(200).json({
+        message: "Get Budget Successfully!",
+        budget,
+      });
+    } catch (error) {
+      console.error("Error executing query:", error);
+      res.status(500).json({
+        message: "Error executing query",
+        error: error.message,
+      });
+    }
+  },
+  updateBudget: async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json(errors.array());
+      }
+
+      const { document_id } = req.params;
+      const { amount } = req.body;
+
+      await databases.createDocument(
+        databaseId,
+        collectionBudgetsId,
+        document_id,
+        amount
+      );
+
+      res.status(200).json({
+        message: "Update Budget Successfully!",
       });
     } catch (error) {
       console.error("Error executing query:", error);

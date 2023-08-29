@@ -5,6 +5,7 @@ const { Databases, ID } = require("node-appwrite");
 const databases = new Databases(client);
 const databaseId = process.env.APP_WRITTER_DATABASE_ID;
 const collectionExpensesId = process.env.APP_WRITTER_COLLECTION_EXPENSES_ID;
+const lengthId = process.env.APP_LENGTH_ID_GENERATOR;
 
 module.exports = {
   listExpense: async (req, res) => {
@@ -44,6 +45,12 @@ module.exports = {
           .json({ message: `Expense user with id ${user_id} not found!` });
       }
 
+      if (expense.user_id !== req.user.user_id) {
+        return res
+          .status(401)
+          .json({ message: `User not Autenticated with id ${user_id}!` });
+      }
+
       res.status(200).json({
         message: "Get List Expense Successfully!",
         expense,
@@ -75,6 +82,12 @@ module.exports = {
         });
       }
 
+      if (expense.user_id !== req.user.user_id) {
+        return res.status(401).json({
+          message: `User not Autenticated with document id ${document_id}!`,
+        });
+      }
+
       res.status(200).json({
         message: "Get Detail Expense Successfully!",
         expense,
@@ -95,7 +108,7 @@ module.exports = {
       }
 
       const expense = {
-        expense_id: await generateId(5),
+        expense_id: await generateId(lengthId),
         user_id: req.user.user_id,
         name: req.body.name,
         description: req.body.description,

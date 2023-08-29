@@ -7,6 +7,7 @@ const { Databases, ID } = require("node-appwrite");
 const databases = new Databases(client);
 const databaseId = process.env.APP_WRITTER_DATABASE_ID;
 const collectionUsersId = process.env.APP_WRITTER_COLLECTION_USERS_ID;
+const lengthId = process.env.APP_LENGTH_ID_GENERATOR;
 
 module.exports = {
   register: async (req, res) => {
@@ -17,7 +18,7 @@ module.exports = {
       }
 
       const user = {
-        user_id: await generateId(5),
+        user_id: await generateId(lengthId),
         username: req.body.username,
         password: await bcrypt.hash(req.body.password, 10),
         name: req.body.name,

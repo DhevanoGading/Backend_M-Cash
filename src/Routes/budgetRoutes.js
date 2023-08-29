@@ -5,5 +5,6 @@ const budgetController = require("../Controllers/budgetController");
 const { validateToken } = require("../Middleware/auth");
 
 router.post("/", validateToken, addBudgetValidator, budgetController.addBudget);
+router.get("/", validateToken, budgetController.getBudgetById);
 
 module.exports = router;
