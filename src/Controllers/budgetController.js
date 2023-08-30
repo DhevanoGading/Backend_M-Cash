@@ -52,30 +52,6 @@ module.exports = {
       });
     }
   },
-  getBudgetById: async (req, res) => {
-    try {
-      const { user_id } = req.user;
-      const budgetDocuments = await databases.listDocuments(
-        databaseId,
-        collectionBudgetsId
-      );
-
-      const budget = budgetDocuments.documents.find(
-        (e) => e.user_id === user_id
-      );
-
-      res.status(200).json({
-        message: "Get Budget Successfully!",
-        budget,
-      });
-    } catch (error) {
-      console.error("Error executing query:", error);
-      res.status(500).json({
-        message: "Error executing query",
-        error: error.message,
-      });
-    }
-  },
   updateBudget: async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -86,11 +62,12 @@ module.exports = {
       const { document_id } = req.params;
       const { amount } = req.body;
 
-      await databases.createDocument(
+      console.log(document_id);
+
+      await databases.updateDocument(
         databaseId,
         collectionBudgetsId,
-        document_id,
-        amount
+        document_id
       );
 
       res.status(200).json({
