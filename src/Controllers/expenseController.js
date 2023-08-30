@@ -1,7 +1,8 @@
 const client = require("../config/appwritter");
+const { Databases, ID } = require("node-appwrite");
 const { validationResult } = require("express-validator");
 const { generateId } = require("../utils/generateId");
-const { Databases, ID } = require("node-appwrite");
+const { responseTemplate } = require("../utils/responseTemplate");
 const databases = new Databases(client);
 const databaseId = process.env.APP_WRITTER_DATABASE_ID;
 const collectionExpensesId = process.env.APP_WRITTER_COLLECTION_EXPENSES_ID;
@@ -29,26 +30,18 @@ module.exports = {
   },
   listExpenseById: async (req, res) => {
     try {
-      const { user_id } = req.params;
+      const { user_id } = req.user;
       const expenseDocuments = await databases.listDocuments(
         databaseId,
         collectionExpensesId
       );
 
-      const expense = expenseDocuments.documents.find(
+      const expense = expenseDocuments.documents.filter(
         (e) => e.user_id === user_id
       );
 
       if (!expense) {
-        return res
-          .status(404)
-          .json({ message: `Expense user with id ${user_id} not found!` });
-      }
-
-      if (expense.user_id !== req.user.user_id) {
-        return res
-          .status(401)
-          .json({ message: `User not Autenticated with id ${user_id}!` });
+        return res.status(404).json({ message: `Expense user not found!` });
       }
 
       res.status(200).json({
@@ -88,10 +81,12 @@ module.exports = {
         });
       }
 
-      res.status(200).json({
-        message: "Get Detail Expense Successfully!",
-        expense,
-      });
+      await responseTemplate(
+        res,
+        200,
+        "Get Detail Expense Successfully!",
+        expense
+      );
     } catch (error) {
       console.error("Error executing query:", error);
       res.status(500).json({

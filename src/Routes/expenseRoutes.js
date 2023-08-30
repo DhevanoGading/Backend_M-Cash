@@ -5,8 +5,8 @@ const expenseController = require("../Controllers/expenseController");
 const { validateToken } = require("../Middleware/auth");
 
 router.post("/", validateToken, addExpenseValidator, expenseController.addExpenses);
-router.get("/list", validateToken, expenseController.listExpense);
-router.get("/list/:user_id", validateToken, expenseController.listExpenseById);
-router.get("/detail/:document_id", validateToken, expenseController.detailExpense);
+// router.get("/list", validateToken, expenseController.listExpense);
+router.get("/list", validateToken, expenseController.listExpenseById);
+router.get("/:document_id", validateToken, expenseController.detailExpense);
 
 module.exports = router;
