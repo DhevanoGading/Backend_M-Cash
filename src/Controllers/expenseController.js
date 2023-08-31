@@ -9,25 +9,6 @@ const collectionExpensesId = process.env.APP_WRITTER_COLLECTION_EXPENSES_ID;
 const lengthId = process.env.APP_LENGTH_ID_GENERATOR;
 
 module.exports = {
-  listExpense: async (req, res) => {
-    try {
-      const expense = await databases.listDocuments(
-        databaseId,
-        collectionExpensesId
-      );
-
-      res.status(200).json({
-        message: "Get List Expense Successfully!",
-        expense,
-      });
-    } catch (error) {
-      console.error("Error executing query:", error);
-      res.status(500).json({
-        message: "Error executing query",
-        error: error.message,
-      });
-    }
-  },
   listExpenseById: async (req, res) => {
     try {
       const { user_id } = req.user;
@@ -41,7 +22,7 @@ module.exports = {
       );
 
       if (!expense) {
-        return res.status(404).json({ message: `Expense user not found!` });
+        return res.status(404).json({ message: `Users have no expense yet!` });
       }
 
       await responseTemplate(
@@ -50,11 +31,6 @@ module.exports = {
         "Get List Expense Successfully!",
         expense
       );
-
-      // res.status(200).json({
-      //   message: "Get List Expense Successfully!",
-      //   expense,
-      // });
     } catch (error) {
       console.error("Error executing query:", error);
       res.status(500).json({
@@ -127,6 +103,64 @@ module.exports = {
 
       res.status(200).json({
         message: "Add Expense Successfully!",
+      });
+    } catch (error) {
+      console.error("Error executing query:", error);
+      res.status(500).json({
+        message: "Error executing query",
+        error: error.message,
+      });
+    }
+  },
+  updateExpense: async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json(errors.array());
+      }
+
+      const { document_id } = req.params;
+      const { user_id } = req.user;
+
+      const expenseDocuments = await databases.listDocuments(
+        databaseId,
+        collectionExpensesId
+      );
+
+      const expense = expenseDocuments.documents.find(
+        (e) => e.$id === document_id
+      );
+
+      if (!expense) {
+        return res.status(404).json({
+          message: `Expense not found!`,
+        });
+      }
+
+      if (expense.user_id !== user_id) {
+        return res.status(401).json({
+          message: `User is not authenticated with that document id!`,
+        });
+      }
+
+      const newExpense = {
+        expense_id: expense.expense_id,
+        user_id,
+        name: req.body.name,
+        description: req.body.description,
+        expense_date: req.body.expense_date,
+        amount: req.body.amount,
+      };
+
+      await databases.updateDocument(
+        databaseId,
+        collectionExpensesId,
+        expense.$id,
+        newExpense
+      );
+
+      res.status(200).json({
+        message: "Update Expense Successfully!",
       });
     } catch (error) {
       console.error("Error executing query:", error);
