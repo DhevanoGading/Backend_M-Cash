@@ -54,13 +54,13 @@ module.exports = {
 
       if (!expense) {
         return res.status(404).json({
-          message: `Expense user with document id ${document_id} not found!`,
+          message: `Expense not found!`,
         });
       }
 
       if (expense.user_id !== req.user.user_id) {
         return res.status(401).json({
-          message: `User not Autenticated with document id ${document_id}!`,
+          message: `User is not authenticated with that document id!`,
         });
       }
 
