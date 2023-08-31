@@ -44,10 +44,17 @@ module.exports = {
         return res.status(404).json({ message: `Expense user not found!` });
       }
 
-      res.status(200).json({
-        message: "Get List Expense Successfully!",
-        expense,
-      });
+      await responseTemplate(
+        res,
+        200,
+        "Get List Expense Successfully!",
+        expense
+      );
+
+      // res.status(200).json({
+      //   message: "Get List Expense Successfully!",
+      //   expense,
+      // });
     } catch (error) {
       console.error("Error executing query:", error);
       res.status(500).json({
