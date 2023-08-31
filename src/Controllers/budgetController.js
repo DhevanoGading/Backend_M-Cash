@@ -52,6 +52,21 @@ module.exports = {
       });
     }
   },
+  listBudget: async (req, res) => {
+    try {
+      const data = await databases.listDocuments(
+        `${databaseId}`,
+        `${collectionBudgetsId}`
+      );
+      res.status(200).json(data);
+    } catch (error) {
+      console.error("Error executing query:", error);
+      res.status(500).json({
+        message: "Error executing query",
+        error: error.message,
+      });
+    }
+  },
   updateBudget: async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -60,14 +75,17 @@ module.exports = {
       }
 
       const { document_id } = req.params;
-      const { amount } = req.body;
-
-      console.log(document_id);
+      const { amount, budget_id, user_id } = req.body;
 
       await databases.updateDocument(
-        databaseId,
-        collectionBudgetsId,
-        document_id
+        `${databaseId}`,
+        `${collectionBudgetsId}`,
+        `${document_id}`,
+        {
+          amount,
+          budget_id,
+          user_id,
+        }
       );
 
       res.status(200).json({
