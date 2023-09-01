@@ -6,7 +6,6 @@ const { responseTemplate } = require("../utils/responseTemplate");
 const databases = new Databases(client);
 const databaseId = process.env.APP_WRITTER_DATABASE_ID;
 const collectionExpensesId = process.env.APP_WRITTER_COLLECTION_EXPENSES_ID;
-const collectionBudgetsId = process.env.APP_WRITTER_COLLECTION_BUDGETS_ID;
 const lengthId = process.env.APP_LENGTH_ID_GENERATOR;
 
 module.exports = {
@@ -25,6 +24,12 @@ module.exports = {
       const budget = expenseDocuments.documents.find(
         (e) => e.user_id === user_id
       );
+
+      // total;
+
+      for (let i = 0; i < expense.length; i++) {
+        console.log(expense[i].amount);
+      }
 
       await responseTemplate(
         res,
