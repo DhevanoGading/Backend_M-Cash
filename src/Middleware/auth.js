@@ -15,7 +15,6 @@ module.exports = {
   },
 
   validateToken: (req, res, next) => {
-    // const accessToken = req.headers.authorization;
     const accessToken = req.cookies["access_token"];
 
     if (!accessToken || accessToken === undefined || accessToken === "")
