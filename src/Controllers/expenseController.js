@@ -22,10 +22,6 @@ module.exports = {
         (e) => e.user_id === user_id
       );
 
-      // if (!expense) {
-      //   return res.status(404).json({ message: `Users have no expense yet!` });
-      // }
-
       const budget = expenseDocuments.documents.find(
         (e) => e.user_id === user_id
       );
@@ -167,6 +163,31 @@ module.exports = {
 
       res.status(200).json({
         message: "Update Expense Successfully!",
+      });
+    } catch (error) {
+      console.error("Error executing query:", error);
+      res.status(500).json({
+        message: "Error executing query",
+        error: error.message,
+      });
+    }
+  },
+  deleteExpense: async (req, res) => {
+    try {
+      const { document_id } = req.params;
+
+      try {
+        await databases.deleteDocument(
+          databaseId,
+          collectionExpensesId,
+          document_id
+        );
+      } catch (error) {
+        return res.status(404).json({ message: error.message });
+      }
+
+      res.status(200).json({
+        message: "Delete Expense Successfully!",
       });
     } catch (error) {
       console.error("Error executing query:", error);

@@ -8,5 +8,6 @@ router.post("/", validateToken, addExpenseValidator, expenseController.addExpens
 router.get("/list", validateToken, expenseController.listExpenseById);
 router.get("/:document_id", validateToken, expenseController.detailExpense);
 router.put("/:document_id", validateToken, addExpenseValidator, expenseController.updateExpense);
+router.delete("/:document_id", validateToken, expenseController.deleteExpense);
 
 module.exports = router;
