@@ -6,6 +6,7 @@ const { responseTemplate } = require("../utils/responseTemplate");
 const databases = new Databases(client);
 const databaseId = process.env.APP_WRITTER_DATABASE_ID;
 const collectionExpensesId = process.env.APP_WRITTER_COLLECTION_EXPENSES_ID;
+const collectionBudgetsId = process.env.APP_WRITTER_COLLECTION_BUDGETS_ID;
 const lengthId = process.env.APP_LENGTH_ID_GENERATOR;
 
 module.exports = {
@@ -21,15 +22,20 @@ module.exports = {
         (e) => e.user_id === user_id
       );
 
-      if (!expense) {
-        return res.status(404).json({ message: `Users have no expense yet!` });
-      }
+      // if (!expense) {
+      //   return res.status(404).json({ message: `Users have no expense yet!` });
+      // }
+
+      const budget = expenseDocuments.documents.find(
+        (e) => e.user_id === user_id
+      );
 
       await responseTemplate(
         res,
         200,
         "Get List Expense Successfully!",
-        expense
+        expense,
+        budget.amount
       );
     } catch (error) {
       console.error("Error executing query:", error);

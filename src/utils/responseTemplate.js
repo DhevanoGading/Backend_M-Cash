@@ -1,5 +1,5 @@
 module.exports = {
-  responseTemplate: async (res, status, message, data) => {
+  responseTemplate: async (res, status, message, data, anotherData = null) => {
     let cleanedData = null;
 
     if (Array.isArray(data) && data.length > 0) {
@@ -16,9 +16,15 @@ module.exports = {
       delete cleanedData["$databaseId"];
     }
 
-    return res.status(status).json({
+    const responseObj = {
       message,
       data: cleanedData || data,
-    });
+    };
+
+    if (anotherData !== null) {
+      responseObj.budget = anotherData;
+    }
+
+    return res.status(status).json(responseObj);
   },
 };
