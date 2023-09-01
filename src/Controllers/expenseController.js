@@ -6,37 +6,56 @@ const { responseTemplate } = require("../utils/responseTemplate");
 const databases = new Databases(client);
 const databaseId = process.env.APP_WRITTER_DATABASE_ID;
 const collectionExpensesId = process.env.APP_WRITTER_COLLECTION_EXPENSES_ID;
+const collectionBudgetsId = process.env.APP_WRITTER_COLLECTION_BUDGETS_ID;
 const lengthId = process.env.APP_LENGTH_ID_GENERATOR;
 
 module.exports = {
   listExpenseById: async (req, res) => {
     try {
       const { user_id } = req.user;
+      const startDate = new Date(req.body.startDate);
+      const endDate = new Date(req.body.endDate);
+
       const expenseDocuments = await databases.listDocuments(
         databaseId,
         collectionExpensesId
+      );
+
+      const budgetDocuments = await databases.listDocuments(
+        databaseId,
+        collectionBudgetsId
       );
 
       const expense = expenseDocuments.documents.filter(
         (e) => e.user_id === user_id
       );
 
-      const budget = expenseDocuments.documents.find(
+      const filteredExpenses = expense.filter((item) => {
+        const expenseDate = new Date(item.expense_date);
+        return expenseDate >= startDate && expenseDate <= endDate;
+      });
+
+      const budget = budgetDocuments.documents.find(
         (e) => e.user_id === user_id
       );
 
-      // total;
+      let totalBudget;
 
-      for (let i = 0; i < expense.length; i++) {
-        console.log(expense[i].amount);
+      if (!budget) {
+        totalBudget = 0;
+      } else {
+        totalBudget = budget.amount;
+        for (let i = 0; i < filteredExpenses.length; i++) {
+          totalBudget -= filteredExpenses[i].amount;
+        }
       }
 
       await responseTemplate(
         res,
         200,
         "Get List Expense Successfully!",
-        expense,
-        budget.amount
+        filteredExpenses,
+        totalBudget
       );
     } catch (error) {
       console.error("Error executing query:", error);

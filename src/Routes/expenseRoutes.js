@@ -5,7 +5,7 @@ const expenseController = require("../Controllers/expenseController");
 const { validateToken } = require("../Middleware/auth");
 
 router.post("/", validateToken, addExpenseValidator, expenseController.addExpenses);
-router.get("/list", validateToken, expenseController.listExpenseById);
+router.post("/list", validateToken, expenseController.listExpenseById);
 router.get("/:document_id", validateToken, expenseController.detailExpense);
 router.put("/:document_id", validateToken, addExpenseValidator, expenseController.updateExpense);
 router.delete("/:document_id", validateToken, expenseController.deleteExpense);
