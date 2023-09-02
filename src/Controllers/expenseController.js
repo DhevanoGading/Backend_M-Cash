@@ -39,14 +39,20 @@ module.exports = {
         (e) => e.user_id === user_id
       );
 
-      let totalBudget;
+      let initialBudget;
+
+      let totalExpense = 0;
+
+      let budgetRemaining;
 
       if (!budget) {
-        totalBudget = 0;
+        budgetRemaining = 0;
+        initialBudget = 0;
       } else {
-        totalBudget = budget.amount;
+        budgetRemaining = initialBudget = budget.amount;
         for (let i = 0; i < filteredExpenses.length; i++) {
-          totalBudget -= filteredExpenses[i].amount;
+          budgetRemaining -= filteredExpenses[i].amount;
+          totalExpense += filteredExpenses[i].amount;
         }
       }
 
@@ -55,7 +61,9 @@ module.exports = {
         200,
         "Get List Expense Successfully!",
         filteredExpenses,
-        totalBudget
+        initialBudget,
+        totalExpense,
+        budgetRemaining
       );
     } catch (error) {
       console.error("Error executing query:", error);

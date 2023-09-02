@@ -1,5 +1,13 @@
 module.exports = {
-  responseTemplate: async (res, status, message, data, anotherData = null) => {
+  responseTemplate: async (
+    res,
+    status,
+    message,
+    data,
+    budgetInit = null,
+    totalExpense = null,
+    budgetRemaining = null
+  ) => {
     let cleanedData = null;
 
     if (Array.isArray(data) && data.length > 0) {
@@ -21,8 +29,14 @@ module.exports = {
       data: cleanedData || data,
     };
 
-    if (anotherData !== null) {
-      responseObj.budget = anotherData;
+    if (
+      budgetInit !== null ||
+      totalExpense !== null ||
+      budgetRemaining !== null
+    ) {
+      responseObj.budgetInit = budgetInit;
+      responseObj.totalExpense = totalExpense;
+      responseObj.budgetRemaining = budgetRemaining;
     }
 
     return res.status(status).json(responseObj);
