@@ -2,7 +2,6 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const { createProxyMiddleware } = require("http-proxy-middleware");
 
 const port = process.env.APP_PORT || 80;
 
@@ -17,14 +16,6 @@ app.use(
     credentials: true,
   })
 );
-
-// Konfigurasi proxy middleware
-const apiProxy = createProxyMiddleware({
-  target: "http://localhost:8081", // Ganti dengan URL backend Anda
-  changeOrigin: true,
-});
-
-app.use("/user/login", apiProxy);
 
 const swaggerJSDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
