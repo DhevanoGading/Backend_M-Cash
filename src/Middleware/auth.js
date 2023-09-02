@@ -15,7 +15,8 @@ module.exports = {
   },
 
   validateToken: (req, res, next) => {
-    const accessToken = req.cookies["access_token"];
+    const accessToken = req.headers.authorization;
+    // const accessToken = req.cookies["access_token"];
 
     if (!accessToken || accessToken === undefined || accessToken === "")
       return res.status(401).json({ error: "User not Autenticated!" });

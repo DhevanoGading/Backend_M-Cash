@@ -73,6 +73,7 @@ module.exports = {
         });
         res.status(200).json({
           message: "Logged in Succesfully!",
+          access_token: accessToken,
         });
       } else {
         res.status(401).json({
